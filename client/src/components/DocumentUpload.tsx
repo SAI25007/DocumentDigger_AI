@@ -5,7 +5,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
-import { Upload, FileText, Mail } from "lucide-react";
+import { CloudUpload, FileText, Mail, Sparkles, Zap } from "lucide-react";
 
 interface DocumentUploadProps {
   onUploadSuccess: () => void;
@@ -116,59 +116,90 @@ export default function DocumentUpload({ onUploadSuccess }: DocumentUploadProps)
   };
 
   return (
-    <Card>
+    <Card className="hover:shadow-xl transition-all duration-300 animate-slide-up border-0 bg-white/70 backdrop-blur-sm">
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
-          <Upload className="w-5 h-5" />
-          <span>Document Upload</span>
+          <div className="w-8 h-8 gradient-primary rounded-lg flex items-center justify-center">
+            <CloudUpload className="w-5 h-5 text-white" />
+          </div>
+          <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            Document Upload
+          </span>
         </CardTitle>
         <p className="text-gray-600">Drag and drop files or connect to your email system</p>
       </CardHeader>
       <CardContent>
         <div
-          className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors cursor-pointer ${
+          className={`border-2 border-dashed rounded-2xl p-8 text-center transition-all duration-300 cursor-pointer relative overflow-hidden ${
             isDragOver
-              ? "border-primary bg-blue-50"
-              : "border-gray-300 hover:border-primary hover:bg-blue-50"
+              ? "border-purple-400 bg-gradient-to-br from-purple-50 to-blue-50 scale-105"
+              : "border-gray-300 hover:border-purple-400 hover:bg-gradient-to-br hover:from-purple-50 hover:to-blue-50 hover:scale-102"
           }`}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
           onClick={handleBrowseClick}
         >
-          <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-xl font-medium text-gray-700 mb-2">
-            {uploadMutation.isPending ? "Uploading..." : "Drop files here to upload"}
-          </p>
-          <p className="text-gray-500 mb-4">or click to browse</p>
+          {/* Animated background elements */}
+          <div className="absolute top-4 right-4 w-8 h-8 bg-purple-200 rounded-full opacity-30 animate-pulse"></div>
+          <div className="absolute bottom-4 left-4 w-6 h-6 bg-blue-200 rounded-full opacity-30 animate-pulse"></div>
           
-          <div className="flex justify-center space-x-4">
-            <Button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleBrowseClick();
-              }}
-              disabled={uploadMutation.isPending}
-              className="bg-primary hover:bg-blue-700"
-            >
-              Browse Files
-            </Button>
-            <Button
-              onClick={(e) => {
-                e.stopPropagation();
-                handleEmailConnect();
-              }}
-              variant="secondary"
-              disabled={uploadMutation.isPending}
-            >
-              <Mail className="w-4 h-4 mr-2" />
-              Connect Mailbox
-            </Button>
+          <div className="relative z-10">
+            <div className={`w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+              uploadMutation.isPending ? "gradient-primary animate-pulse" : "bg-gradient-to-br from-purple-100 to-blue-100"
+            }`}>
+              {uploadMutation.isPending ? (
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+              ) : (
+                <FileText className={`w-8 h-8 transition-colors duration-300 ${
+                  isDragOver ? "text-purple-600" : "text-gray-400"
+                }`} />
+              )}
+            </div>
+            
+            <p className="text-xl font-medium text-gray-700 mb-2">
+              {uploadMutation.isPending ? (
+                <span className="flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 mr-2 animate-pulse" />
+                  Processing your document...
+                </span>
+              ) : (
+                "Drop files here to upload"
+              )}
+            </p>
+            <p className="text-gray-500 mb-6">or click to browse</p>
+            
+            <div className="flex justify-center space-x-4">
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleBrowseClick();
+                }}
+                disabled={uploadMutation.isPending}
+                className="gradient-primary hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+              >
+                <CloudUpload className="w-4 h-4 mr-2" />
+                Browse Files
+              </Button>
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleEmailConnect();
+                }}
+                variant="secondary"
+                disabled={uploadMutation.isPending}
+                className="hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl bg-white/80 backdrop-blur-sm"
+              >
+                <Mail className="w-4 h-4 mr-2" />
+                Connect Mailbox
+              </Button>
+            </div>
+            
+            <p className="text-xs text-gray-500 mt-6 flex items-center justify-center">
+              <Zap className="w-3 h-3 mr-1" />
+              Supported formats: PDF, Word documents, JPG, PNG (Max 50MB)
+            </p>
           </div>
-          
-          <p className="text-xs text-gray-500 mt-4">
-            Supported formats: PDF, Word documents, JPG, PNG (Max 50MB)
-          </p>
         </div>
         
         <input

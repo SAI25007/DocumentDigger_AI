@@ -1,31 +1,32 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
 import { useQuery } from "@tanstack/react-query";
-import { CheckCircle, Clock, AlertCircle, Upload, FileText, Tag, Send } from "lucide-react";
+import { CheckCircle2, Timer, AlertOctagon, CloudUpload, Search, Target, Rocket, Activity } from "lucide-react";
 import type { DocumentWithStages } from "@shared/schema";
 
 const stageConfig = [
   { 
     name: "Ingested", 
-    icon: Upload, 
+    icon: CloudUpload, 
     description: "File received and metadata extracted",
     color: "blue"
   },
   { 
     name: "Extracted", 
-    icon: FileText, 
+    icon: Search, 
     description: "Text and entities extracted using AI",
     color: "green"
   },
   { 
     name: "Classified", 
-    icon: Tag, 
+    icon: Target, 
     description: "Document type identified with confidence",
     color: "purple"
   },
   { 
     name: "Routed", 
-    icon: Send, 
+    icon: Rocket, 
     description: "Delivered to target systems",
     color: "orange"
   },
@@ -62,11 +63,11 @@ export default function ProcessingPipeline() {
   const getStageIcon = (status: string, StageIcon: any) => {
     switch (status) {
       case 'completed':
-        return <CheckCircle className="w-5 h-5" />;
+        return <CheckCircle2 className="w-5 h-5" />;
       case 'processing':
-        return <Clock className="w-5 h-5 animate-pulse" />;
+        return <Timer className="w-5 h-5 animate-pulse" />;
       case 'failed':
-        return <AlertCircle className="w-5 h-5" />;
+        return <AlertOctagon className="w-5 h-5" />;
       default:
         return <StageIcon className="w-5 h-5" />;
     }
@@ -103,15 +104,24 @@ export default function ProcessingPipeline() {
   };
 
   return (
-    <Card>
+    <Card className="hover:shadow-xl transition-all duration-300 animate-slide-right border-0 bg-white/70 backdrop-blur-sm">
       <CardHeader>
-        <CardTitle>Processing Pipeline</CardTitle>
+        <CardTitle className="flex items-center space-x-2">
+          <div className="w-8 h-8 gradient-primary rounded-lg flex items-center justify-center">
+            <Activity className="w-5 h-5 text-white" />
+          </div>
+          <span className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            Processing Pipeline
+          </span>
+        </CardTitle>
         <p className="text-gray-600">Live workflow status</p>
       </CardHeader>
       <CardContent>
         {!selectedDocumentId ? (
-          <div className="text-center text-gray-500 py-8">
-            <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+          <div className="text-center text-gray-500 py-8 animate-fade-scale">
+            <div className="w-16 h-16 bg-gradient-to-br from-purple-100 to-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <Activity className="w-8 h-8 text-gray-400" />
+            </div>
             <p>Select a document to view its processing pipeline</p>
           </div>
         ) : isLoading ? (
@@ -120,17 +130,17 @@ export default function ProcessingPipeline() {
             <span className="ml-3 text-gray-600">Loading pipeline...</span>
           </div>
         ) : document ? (
-          <div>
+          <div className="animate-fade-scale">
             {/* Document Info */}
-            <div className="mb-6">
-              <h3 className="font-medium text-gray-900 truncate">{document.originalName}</h3>
+            <div className="mb-6 p-4 bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl border border-purple-100">
+              <h3 className="font-medium text-gray-900 truncate">{(document as any).originalName}</h3>
               <p className="text-sm text-gray-500">
-                Processing Stage {document.currentStage}/4
+                Processing Stage {(document as any).currentStage}/4
               </p>
-              {document.documentType && (
+              {(document as any).documentType && (
                 <p className="text-sm text-gray-600 mt-1">
-                  Type: {document.documentType}
-                  {document.confidence && ` (${document.confidence}% confidence)`}
+                  Type: {(document as any).documentType}
+                  {(document as any).confidence && ` (${(document as any).confidence}% confidence)`}
                 </p>
               )}
             </div>
@@ -139,15 +149,21 @@ export default function ProcessingPipeline() {
             <div className="space-y-4">
               {stageConfig.map((stage, index) => {
                 const stageNumber = index + 1;
-                const status = getStageStatus(stageNumber, document);
-                const stageRecord = document.stages.find(s => s.stage === stageNumber);
+                const status = getStageStatus(stageNumber, document as any);
+                const stageRecord = (document as any).stages?.find((s: any) => s.stage === stageNumber);
                 
                 return (
                   <div 
                     key={stageNumber} 
-                    className={`flex items-center ${status === 'processing' ? 'animate-pulse' : ''}`}
+                    className={`flex items-center p-3 rounded-xl transition-all duration-300 ${
+                      status === 'processing' ? 'bg-blue-50 border border-blue-200 animate-pulse' : 
+                      status === 'completed' ? 'bg-green-50 border border-green-200' :
+                      status === 'failed' ? 'bg-red-50 border border-red-200' :
+                      'bg-gray-50 border border-gray-200'
+                    }`}
+                    style={{animationDelay: `${index * 0.1}s`}}
                   >
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${getStageColors(status, stage.color)}`}>
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-lg ${getStageColors(status, stage.color)}`}>
                       {getStageIcon(status, stage.icon)}
                     </div>
                     <div className="ml-4 flex-1">
@@ -159,9 +175,12 @@ export default function ProcessingPipeline() {
                       }`}>
                         {stage.name}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-500 mb-1">
                         {getStatusText(status)}
                       </p>
+                      {status === 'processing' && (
+                        <Progress value={Math.random() * 40 + 30} className="h-1 mb-1" />
+                      )}
                       {stageRecord?.errorMessage && (
                         <p className="text-xs text-red-600 mt-1">
                           Error: {stageRecord.errorMessage}
@@ -179,21 +198,24 @@ export default function ProcessingPipeline() {
             </div>
 
             {/* Processing Progress */}
-            <div className="mt-6">
-              <div className="bg-gray-200 rounded-full h-2">
-                <div 
-                  className="bg-primary rounded-full h-2 transition-all duration-500"
-                  style={{ width: `${(document.currentStage / 4) * 100}%` }}
-                ></div>
+            <div className="mt-6 p-4 bg-gradient-to-r from-gray-50 to-blue-50 rounded-xl">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-gray-700">Overall Progress</span>
+                <span className="text-sm font-bold text-primary">{Math.round(((document as any).currentStage / 4) * 100)}%</span>
               </div>
+              <Progress 
+                value={((document as any).currentStage / 4) * 100} 
+                className="h-3 animate-progress"
+                style={{'--progress-width': `${((document as any).currentStage / 4) * 100}%`} as any}
+              />
               <p className="text-xs text-gray-500 mt-2 text-center">
-                {document.currentStage}/4 stages completed
+                {(document as any).currentStage}/4 stages completed
               </p>
             </div>
           </div>
         ) : (
           <div className="text-center text-gray-500 py-8">
-            <AlertCircle className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+            <AlertOctagon className="w-12 h-12 text-gray-300 mx-auto mb-4" />
             <p>Document not found</p>
           </div>
         )}
