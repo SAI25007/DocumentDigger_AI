@@ -92,7 +92,125 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
       const documents = await storage.getUserDocuments(userId);
-      res.json(documents);
+      
+      // Add demo documents if no real data exists
+      if (documents.length === 0) {
+        const demoDocuments = [
+          {
+            id: 1,
+            userId,
+            filename: "demo_contract_001.pdf",
+            originalName: "Enterprise_Service_Agreement_Q4_2024.pdf",
+            fileSize: 2457600,
+            mimeType: "application/pdf",
+            status: "completed",
+            documentType: "Contract",
+            confidence: 94,
+            extractedText: "Service Agreement between DocFlow AI and Enterprise Corp...",
+            metadata: { pages: 12, contractValue: 150000 },
+            currentStage: 4,
+            createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+            updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+            stages: [
+              { id: 1, documentId: 1, stage: 1, status: "completed", startedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000), completedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000 + 2000), details: {}, createdAt: new Date() },
+              { id: 2, documentId: 1, stage: 2, status: "completed", startedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000 + 2000), completedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000 + 5000), details: { extractedText: "Contract text..." }, createdAt: new Date() },
+              { id: 3, documentId: 1, stage: 3, status: "completed", startedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000 + 5000), completedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000 + 7500), details: { documentType: "Contract", confidence: 94 }, createdAt: new Date() },
+              { id: 4, documentId: 1, stage: 4, status: "completed", startedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000 + 7500), completedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000 + 9000), details: { routedTo: "ERP System" }, createdAt: new Date() }
+            ]
+          },
+          {
+            id: 2,
+            userId,
+            filename: "demo_invoice_002.pdf",
+            originalName: "Monthly_Software_License_Invoice_Nov2024.pdf",
+            fileSize: 1024000,
+            mimeType: "application/pdf",
+            status: "processing",
+            documentType: "Invoice",
+            confidence: 87,
+            extractedText: "Invoice #INV-2024-11-001 for software licensing...",
+            metadata: { amount: 5000, vendor: "TechCorp Solutions" },
+            currentStage: 3,
+            createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000),
+            updatedAt: new Date(Date.now() - 1 * 60 * 60 * 1000),
+            stages: [
+              { id: 5, documentId: 2, stage: 1, status: "completed", startedAt: new Date(Date.now() - 6 * 60 * 60 * 1000), completedAt: new Date(Date.now() - 6 * 60 * 60 * 1000 + 2000), details: {}, createdAt: new Date() },
+              { id: 6, documentId: 2, stage: 2, status: "completed", startedAt: new Date(Date.now() - 6 * 60 * 60 * 1000 + 2000), completedAt: new Date(Date.now() - 6 * 60 * 60 * 1000 + 5000), details: { extractedText: "Invoice text..." }, createdAt: new Date() },
+              { id: 7, documentId: 2, stage: 3, status: "processing", startedAt: new Date(Date.now() - 1 * 60 * 60 * 1000), completedAt: null, details: {}, createdAt: new Date() },
+              { id: 8, documentId: 2, stage: 4, status: "pending", startedAt: null, completedAt: null, details: {}, createdAt: new Date() }
+            ]
+          },
+          {
+            id: 3,
+            userId,
+            filename: "demo_receipt_003.jpg",
+            originalName: "Office_Supplies_Receipt_Staples_Dec2024.jpg",
+            fileSize: 512000,
+            mimeType: "image/jpeg",
+            status: "completed",
+            documentType: "Receipt",
+            confidence: 91,
+            extractedText: "Receipt from Staples for office supplies totaling $247.83...",
+            metadata: { total: 247.83, store: "Staples #1425" },
+            currentStage: 4,
+            createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+            updatedAt: new Date(Date.now() - 12 * 60 * 60 * 1000),
+            stages: [
+              { id: 9, documentId: 3, stage: 1, status: "completed", startedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000), completedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000 + 2000), details: {}, createdAt: new Date() },
+              { id: 10, documentId: 3, stage: 2, status: "completed", startedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000 + 2000), completedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000 + 5000), details: { extractedText: "Receipt text..." }, createdAt: new Date() },
+              { id: 11, documentId: 3, stage: 3, status: "completed", startedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000 + 5000), completedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000 + 7500), details: { documentType: "Receipt", confidence: 91 }, createdAt: new Date() },
+              { id: 12, documentId: 3, stage: 4, status: "completed", startedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000 + 7500), completedAt: new Date(Date.now() - 12 * 60 * 60 * 1000), details: { routedTo: "Accounting Software" }, createdAt: new Date() }
+            ]
+          },
+          {
+            id: 4,
+            userId,
+            filename: "demo_legal_004.pdf",
+            originalName: "NDA_TechPartner_Collaboration_2024.pdf",
+            fileSize: 1843200,
+            mimeType: "application/pdf",
+            status: "failed",
+            documentType: null,
+            confidence: null,
+            extractedText: null,
+            metadata: {},
+            currentStage: 2,
+            createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000),
+            updatedAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
+            stages: [
+              { id: 13, documentId: 4, stage: 1, status: "completed", startedAt: new Date(Date.now() - 3 * 60 * 60 * 1000), completedAt: new Date(Date.now() - 3 * 60 * 60 * 1000 + 2000), details: {}, createdAt: new Date() },
+              { id: 14, documentId: 4, stage: 2, status: "failed", startedAt: new Date(Date.now() - 3 * 60 * 60 * 1000 + 2000), completedAt: new Date(Date.now() - 2 * 60 * 60 * 1000), errorMessage: "OCR extraction failed: corrupted PDF format", details: {}, createdAt: new Date() },
+              { id: 15, documentId: 4, stage: 3, status: "pending", startedAt: null, completedAt: null, details: {}, createdAt: new Date() },
+              { id: 16, documentId: 4, stage: 4, status: "pending", startedAt: null, completedAt: null, details: {}, createdAt: new Date() }
+            ]
+          },
+          {
+            id: 5,
+            userId,
+            filename: "demo_purchase_005.pdf",
+            originalName: "Hardware_Purchase_Order_Q1_2025.pdf",
+            fileSize: 3276800,
+            mimeType: "application/pdf",
+            status: "processing",
+            documentType: null,
+            confidence: null,
+            extractedText: "Purchase Order #PO-2025-001 for server hardware...",
+            metadata: {},
+            currentStage: 2,
+            createdAt: new Date(Date.now() - 30 * 60 * 1000),
+            updatedAt: new Date(Date.now() - 5 * 60 * 1000),
+            stages: [
+              { id: 17, documentId: 5, stage: 1, status: "completed", startedAt: new Date(Date.now() - 30 * 60 * 1000), completedAt: new Date(Date.now() - 30 * 60 * 1000 + 2000), details: {}, createdAt: new Date() },
+              { id: 18, documentId: 5, stage: 2, status: "processing", startedAt: new Date(Date.now() - 5 * 60 * 1000), completedAt: null, details: {}, createdAt: new Date() },
+              { id: 19, documentId: 5, stage: 3, status: "pending", startedAt: null, completedAt: null, details: {}, createdAt: new Date() },
+              { id: 20, documentId: 5, stage: 4, status: "pending", startedAt: null, completedAt: null, details: {}, createdAt: new Date() }
+            ]
+          }
+        ];
+        res.json(demoDocuments);
+      } else {
+        res.json(documents);
+      }
     } catch (error) {
       console.error("Error fetching documents:", error);
       res.status(500).json({ message: "Failed to fetch documents" });
@@ -170,7 +288,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const userId = req.user.claims.sub;
       const stats = await storage.getUserStats(userId);
-      res.json(stats);
+      
+      // Add demo data if no real data exists
+      if (stats.total === 0) {
+        const demoStats = {
+          total: 247,
+          processed: 228,
+          processing: 12,
+          failed: 7
+        };
+        res.json(demoStats);
+      } else {
+        res.json(stats);
+      }
     } catch (error) {
       console.error("Error fetching stats:", error);
       res.status(500).json({ message: "Failed to fetch stats" });
