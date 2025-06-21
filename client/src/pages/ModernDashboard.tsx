@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Brain, Upload, Zap, FileText, Users, TrendingUp, LogOut, Settings, Bell, Menu, Home, BarChart3, Monitor } from "lucide-react";
+import { Brain, Upload, Zap, FileText, Users, TrendingUp, LogOut, Settings, Bell, Menu, Home, BarChart3, Monitor, FileSearch, Route } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
@@ -9,17 +9,24 @@ import { useAuth } from "@/hooks/useAuth";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { AnimatedBackground } from "@/components/ui/animated-background";
 import { GlassCard } from "@/components/ui/glass-card";
-import { UploadZone } from "@/components/ui/upload-zone";
 import { WorkflowProgress } from "@/components/ui/workflow-progress";
 import { DocumentGrid } from "@/components/ui/document-grid";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { IngestPanel } from "@/components/stage-panels/IngestPanel";
+import { ExtractPanel } from "@/components/stage-panels/ExtractPanel";
+import { ClassifyPanel } from "@/components/stage-panels/ClassifyPanel";
+import { RoutePanel } from "@/components/stage-panels/RoutePanel";
 import { motion } from "framer-motion";
+import { Link, useLocation } from "wouter";
 import type { DocumentWithStages } from "@shared/schema";
 
 export default function ModernDashboard() {
   const { user, isLoading: authLoading } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState("dashboard");
+  const [location, setLocation] = useLocation();
+  const [activeTab, setActiveTab] = useState("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedDocument, setSelectedDocument] = useState<DocumentWithStages | null>(null);
 
@@ -136,13 +143,6 @@ export default function ModernDashboard() {
     });
   };
 
-  const navigationItems = [
-    { id: "dashboard", label: "Dashboard", icon: Home },
-    { id: "uploads", label: "Uploads", icon: Upload },
-    { id: "monitoring", label: "Monitoring", icon: Monitor },
-    { id: "settings", label: "Settings", icon: Settings },
-  ];
-
   if (authLoading) {
     return (
       <AnimatedBackground variant="minimal">
@@ -154,296 +154,334 @@ export default function ModernDashboard() {
   }
 
   return (
-    <AnimatedBackground variant="default">
-      <div className="min-h-screen">
-        {/* Navigation Bar */}
-        <motion.nav
-          initial={{ y: -50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          className="border-b border-white/10 backdrop-blur-md bg-white/5"
-        >
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between items-center h-16">
-              {/* Logo and Navigation */}
-              <div className="flex items-center space-x-8">
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
-                    <Brain className="w-6 h-6 text-white" />
-                  </div>
-                  <span className="text-xl font-bold text-white">DocFlow AI</span>
+    <AnimatedBackground variant="neural">
+      <div className="min-h-screen bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        {/* Header */}
+        <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+          <div className="container flex h-16 items-center justify-between px-4">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="md:hidden"
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                  <Brain className="h-5 w-5 text-white" />
                 </div>
-
-                {/* Desktop Navigation */}
-                <div className="hidden md:flex space-x-1">
-                  {navigationItems.map((item) => {
-                    const Icon = item.icon;
-                    return (
-                      <Button
-                        key={item.id}
-                        variant={activeTab === item.id ? "default" : "ghost"}
-                        onClick={() => setActiveTab(item.id)}
-                        className={`text-white hover:bg-white/10 ${
-                          activeTab === item.id ? "bg-white/20" : ""
-                        }`}
-                      >
-                        <Icon className="w-4 h-4 mr-2" />
-                        {item.label}
-                      </Button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* User Menu */}
-              <div className="flex items-center space-x-4">
-                <Button variant="ghost" size="sm" className="text-white hover:bg-white/10">
-                  <Bell className="w-4 h-4" />
-                </Button>
-                
-                <div className="flex items-center space-x-3">
-                  {user?.profileImageUrl && (
-                    <img
-                      src={user.profileImageUrl}
-                      alt="User Avatar"
-                      className="w-8 h-8 rounded-full object-cover ring-2 ring-purple-200 shadow-lg"
-                    />
-                  )}
-                  <span className="text-sm font-medium text-white hidden sm:block">
-                    {user?.firstName || user?.email}
-                  </span>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleLogout}
-                    className="text-white hover:bg-white/10"
-                  >
-                    <LogOut className="w-4 h-4" />
-                  </Button>
-                </div>
-
-                {/* Mobile menu button */}
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="md:hidden text-white"
-                  onClick={() => setSidebarOpen(!sidebarOpen)}
-                >
-                  <Menu className="w-4 h-4" />
-                </Button>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  DocFlow AI
+                </h1>
               </div>
             </div>
+
+            <div className="flex items-center gap-2">
+              <Link href="/upload">
+                <Button variant="default" size="sm" className="gap-2">
+                  <Upload className="h-4 w-4" />
+                  Upload
+                </Button>
+              </Link>
+              <ThemeToggle />
+              <Button variant="ghost" size="icon">
+                <Bell className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="icon">
+                <Settings className="h-4 w-4" />
+              </Button>
+              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted">
+                <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full" />
+                <span className="text-sm font-medium">{user?.firstName || user?.email}</span>
+              </div>
+              <Button variant="ghost" size="icon" asChild>
+                <a href="/api/logout">
+                  <LogOut className="h-4 w-4" />
+                </a>
+              </Button>
+            </div>
           </div>
-        </motion.nav>
+        </header>
 
         {/* Main Content */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            {/* Left Sidebar - Stats */}
-            <motion.div
-              initial={{ x: -50, opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-              className="lg:col-span-1 space-y-6"
-            >
-              <GlassCard className="p-6">
-                <h3 className="text-lg font-semibold text-white mb-4">System Health</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-300">Processing Speed</span>
-                    <div className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                      <span className="text-green-400 text-sm">Optimal</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-300">Queue Status</span>
-                    <span className="text-blue-400 text-sm">12 pending</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-300">Accuracy Rate</span>
-                    <span className="text-purple-400 text-sm">99.2%</span>
-                  </div>
-                </div>
-              </GlassCard>
+        <div className="flex">
+          {/* Sidebar */}
+          <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 border-r transform transition-transform duration-200 ease-in-out md:relative md:translate-x-0 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+            <div className="flex flex-col h-full pt-4">
+              <nav className="flex-1 px-4 space-y-2">
+                <Button
+                  variant={activeTab === "overview" ? "default" : "ghost"}
+                  className="w-full justify-start gap-2"
+                  onClick={() => setActiveTab("overview")}
+                >
+                  <Home className="h-4 w-4" />
+                  Overview
+                </Button>
+                <Button
+                  variant={activeTab === "ingest" ? "default" : "ghost"}
+                  className="w-full justify-start gap-2"
+                  onClick={() => setActiveTab("ingest")}
+                >
+                  <Upload className="h-4 w-4" />
+                  Ingest
+                </Button>
+                <Button
+                  variant={activeTab === "extract" ? "default" : "ghost"}
+                  className="w-full justify-start gap-2"
+                  onClick={() => setActiveTab("extract")}
+                >
+                  <FileSearch className="h-4 w-4" />
+                  Extract
+                </Button>
+                <Button
+                  variant={activeTab === "classify" ? "default" : "ghost"}
+                  className="w-full justify-start gap-2"
+                  onClick={() => setActiveTab("classify")}
+                >
+                  <Brain className="h-4 w-4" />
+                  Classify
+                </Button>
+                <Button
+                  variant={activeTab === "route" ? "default" : "ghost"}
+                  className="w-full justify-start gap-2"
+                  onClick={() => setActiveTab("route")}
+                >
+                  <Route className="h-4 w-4" />
+                  Route
+                </Button>
+                <Button
+                  variant={activeTab === "analytics" ? "default" : "ghost"}
+                  className="w-full justify-start gap-2"
+                  onClick={() => setActiveTab("analytics")}
+                >
+                  <BarChart3 className="h-4 w-4" />
+                  Analytics
+                </Button>
+              </nav>
+            </div>
+          </aside>
 
-              <GlassCard className="p-6">
-                <h3 className="text-lg font-semibold text-white mb-4">Quick Stats</h3>
-                <div className="space-y-4">
-                  {stats && (
-                    <>
-                      <div className="text-center p-4 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-lg">
-                        <div className="text-2xl font-bold text-white">{stats.total}</div>
-                        <div className="text-sm text-gray-300">Total Documents</div>
-                      </div>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="text-center p-3 bg-green-500/20 rounded-lg">
-                          <div className="text-lg font-semibold text-green-400">{stats.processed}</div>
-                          <div className="text-xs text-gray-300">Processed</div>
-                        </div>
-                        <div className="text-center p-3 bg-orange-500/20 rounded-lg">
-                          <div className="text-lg font-semibold text-orange-400">{stats.processing}</div>
-                          <div className="text-xs text-gray-300">Processing</div>
-                        </div>
-                      </div>
-                    </>
-                  )}
-                </div>
-              </GlassCard>
-            </motion.div>
-
-            {/* Main Content Area */}
-            <div className="lg:col-span-3 space-y-8">
-              {activeTab === "dashboard" && (
-                <>
-                  {/* Upload Zone */}
-                  <motion.div
-                    initial={{ y: 50, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.3 }}
-                  >
-                    <UploadZone
-                      onFileUpload={handleFileUpload}
-                      isUploading={uploadMutation.isPending}
-                    />
-                  </motion.div>
-
-                  {/* Workflow Progress */}
-                  <motion.div
-                    initial={{ y: 50, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                  >
+          {/* Content Area */}
+          <main className="flex-1 overflow-auto">
+            <div className="container mx-auto p-6">
+              {activeTab === "overview" && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="space-y-6"
+                >
+                  {/* Stats Cards */}
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                     <GlassCard className="p-6">
-                      <WorkflowProgress
-                        stages={getWorkflowStages(selectedDocument || documents[0])}
-                        currentStage={selectedDocument?.stages.find(s => s.status === "processing")?.stage}
-                      />
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Total Documents</p>
+                          <p className="text-3xl font-bold">{stats?.total || 0}</p>
+                        </div>
+                        <FileText className="h-8 w-8 text-blue-500" />
+                      </div>
                     </GlassCard>
-                  </motion.div>
+                    <GlassCard className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Processed</p>
+                          <p className="text-3xl font-bold text-green-600">{stats?.processed || 0}</p>
+                        </div>
+                        <TrendingUp className="h-8 w-8 text-green-500" />
+                      </div>
+                    </GlassCard>
+                    <GlassCard className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Processing</p>
+                          <p className="text-3xl font-bold text-blue-600">{stats?.processing || 0}</p>
+                        </div>
+                        <Zap className="h-8 w-8 text-blue-500" />
+                      </div>
+                    </GlassCard>
+                    <GlassCard className="p-6">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-sm font-medium text-muted-foreground">Failed</p>
+                          <p className="text-3xl font-bold text-red-600">{stats?.failed || 0}</p>
+                        </div>
+                        <Users className="h-8 w-8 text-red-500" />
+                      </div>
+                    </GlassCard>
+                  </div>
 
-                  {/* Document Grid */}
-                  <motion.div
-                    initial={{ y: 50, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    transition={{ delay: 0.5 }}
-                  >
+                  {/* Processing Pipeline Overview */}
+                  <GlassCard className="p-6">
+                    <h2 className="text-xl font-semibold mb-4">Processing Pipeline Overview</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      {[
+                        { stage: 1, name: "Ingest", icon: Upload, count: documents.filter(d => d.currentStage >= 1).length },
+                        { stage: 2, name: "Extract", icon: FileSearch, count: documents.filter(d => d.currentStage >= 2).length },
+                        { stage: 3, name: "Classify", icon: Brain, count: documents.filter(d => d.currentStage >= 3).length },
+                        { stage: 4, name: "Route", icon: Route, count: documents.filter(d => d.currentStage >= 4).length },
+                      ].map((stage) => (
+                        <Button
+                          key={stage.stage}
+                          variant="outline"
+                          className="h-auto p-4 flex flex-col items-center gap-2"
+                          onClick={() => setActiveTab(stage.name.toLowerCase())}
+                        >
+                          <stage.icon className="h-6 w-6" />
+                          <div className="text-center">
+                            <p className="font-semibold">{stage.name}</p>
+                            <p className="text-sm text-muted-foreground">{stage.count} docs</p>
+                          </div>
+                        </Button>
+                      ))}
+                    </div>
+                  </GlassCard>
+
+                  {/* Recent Documents */}
+                  <GlassCard className="p-6">
+                    <h2 className="text-xl font-semibold mb-4">Recent Documents</h2>
                     <DocumentGrid
-                      documents={documents}
+                      documents={documents.slice(0, 6)}
                       onDocumentClick={handleDocumentClick}
                       onRetry={handleRetry}
                       onReprocess={handleReprocess}
                     />
-                  </motion.div>
-                </>
+                  </GlassCard>
+                </motion.div>
               )}
 
-              {activeTab === "uploads" && (
+              {activeTab === "ingest" && (
                 <motion.div
-                  initial={{ y: 50, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
                   className="space-y-6"
                 >
-                  <UploadZone
-                    onFileUpload={handleFileUpload}
-                    isUploading={uploadMutation.isPending}
-                  />
-                  <DocumentGrid
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-3xl font-bold tracking-tight">Document Ingestion</h2>
+                    <Badge variant="outline" className="px-3 py-1">
+                      Stage 1 of 4
+                    </Badge>
+                  </div>
+                  
+                  <IngestPanel 
                     documents={documents}
-                    onDocumentClick={handleDocumentClick}
-                    onRetry={handleRetry}
-                    onReprocess={handleReprocess}
+                    onDocumentSelect={handleDocumentSelect}
+                    selectedDocument={selectedDocument}
                   />
                 </motion.div>
               )}
 
-              {activeTab === "monitoring" && (
+              {activeTab === "extract" && (
                 <motion.div
-                  initial={{ y: 50, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
                   className="space-y-6"
                 >
-                  <GlassCard className="p-6">
-                    <h2 className="text-xl font-bold text-white mb-6">System Monitoring</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-4">
-                        <h3 className="text-lg font-semibold text-white">Processing Queue</h3>
-                        <div className="space-y-2">
-                          {documents.filter(d => d.status === "processing").map(doc => (
-                            <div key={doc.id} className="flex items-center justify-between p-3 bg-white/5 rounded-lg">
-                              <span className="text-gray-300 truncate">{doc.filename}</span>
-                              <Badge variant="outline" className="border-blue-400 text-blue-400">
-                                Processing
-                              </Badge>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="space-y-4">
-                        <h3 className="text-lg font-semibold text-white">Recent Failures</h3>
-                        <div className="space-y-2">
-                          {documents.filter(d => d.status === "failed").map(doc => (
-                            <div key={doc.id} className="flex items-center justify-between p-3 bg-red-500/10 rounded-lg">
-                              <span className="text-gray-300 truncate">{doc.filename}</span>
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleRetry(doc.id)}
-                                className="border-red-400 text-red-400 hover:bg-red-500/20"
-                              >
-                                Retry
-                              </Button>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                  </GlassCard>
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-3xl font-bold tracking-tight">Text Extraction</h2>
+                    <Badge variant="outline" className="px-3 py-1">
+                      Stage 2 of 4
+                    </Badge>
+                  </div>
+                  
+                  <ExtractPanel 
+                    documents={documents}
+                    onDocumentSelect={handleDocumentSelect}
+                    selectedDocument={selectedDocument}
+                  />
                 </motion.div>
               )}
 
-              {activeTab === "settings" && (
+              {activeTab === "classify" && (
                 <motion.div
-                  initial={{ y: 50, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
                   className="space-y-6"
                 >
-                  <GlassCard className="p-6">
-                    <h2 className="text-xl font-bold text-white mb-6">Settings</h2>
-                    <div className="space-y-6">
-                      <div>
-                        <h3 className="text-lg font-semibold text-white mb-3">Processing Settings</h3>
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between">
-                            <span className="text-gray-300">Auto-classification</span>
-                            <div className="w-12 h-6 bg-blue-500 rounded-full p-1">
-                              <div className="w-4 h-4 bg-white rounded-full transition-transform translate-x-6"></div>
-                            </div>
-                          </div>
-                          <div className="flex items-center justify-between">
-                            <span className="text-gray-300">Real-time notifications</span>
-                            <div className="w-12 h-6 bg-blue-500 rounded-full p-1">
-                              <div className="w-4 h-4 bg-white rounded-full transition-transform translate-x-6"></div>
-                            </div>
-                          </div>
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-3xl font-bold tracking-tight">Document Classification</h2>
+                    <Badge variant="outline" className="px-3 py-1">
+                      Stage 3 of 4
+                    </Badge>
+                  </div>
+                  
+                  <ClassifyPanel 
+                    documents={documents}
+                    onDocumentSelect={handleDocumentSelect}
+                    selectedDocument={selectedDocument}
+                  />
+                </motion.div>
+              )}
+
+              {activeTab === "route" && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="space-y-6"
+                >
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-3xl font-bold tracking-tight">Document Routing</h2>
+                    <Badge variant="outline" className="px-3 py-1">
+                      Stage 4 of 4
+                    </Badge>
+                  </div>
+                  
+                  <RoutePanel 
+                    documents={documents}
+                    onDocumentSelect={handleDocumentSelect}
+                    selectedDocument={selectedDocument}
+                  />
+                </motion.div>
+              )}
+
+              {activeTab === "analytics" && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="space-y-6"
+                >
+                  <h2 className="text-3xl font-bold tracking-tight">Analytics</h2>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <GlassCard className="p-6">
+                      <h3 className="text-lg font-semibold mb-4">Processing Status</h3>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span>Completed</span>
+                          <span className="font-semibold">{stats?.processed || 0}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>In Progress</span>
+                          <span className="font-semibold">{stats?.processing || 0}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Failed</span>
+                          <span className="font-semibold">{stats?.failed || 0}</span>
                         </div>
                       </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-white mb-3">Account</h3>
-                        <Button
-                          onClick={handleLogout}
-                          variant="outline"
-                          className="border-red-400 text-red-400 hover:bg-red-500/20"
-                        >
-                          <LogOut className="w-4 h-4 mr-2" />
-                          Sign Out
-                        </Button>
+                    </GlassCard>
+                    
+                    <GlassCard className="p-6">
+                      <h3 className="text-lg font-semibold mb-4">Stage Performance</h3>
+                      <div className="space-y-3">
+                        {[
+                          { name: "Ingest", completed: documents.filter(d => d.stages.find(s => s.stage === 1)?.status === 'completed').length },
+                          { name: "Extract", completed: documents.filter(d => d.stages.find(s => s.stage === 2)?.status === 'completed').length },
+                          { name: "Classify", completed: documents.filter(d => d.stages.find(s => s.stage === 3)?.status === 'completed').length },
+                          { name: "Route", completed: documents.filter(d => d.stages.find(s => s.stage === 4)?.status === 'completed').length },
+                        ].map((stage) => (
+                          <div key={stage.name} className="flex justify-between">
+                            <span>{stage.name}</span>
+                            <span className="font-semibold">{stage.completed}</span>
+                          </div>
+                        ))}
                       </div>
-                    </div>
-                  </GlassCard>
+                    </GlassCard>
+                  </div>
                 </motion.div>
               )}
             </div>
-          </div>
+          </main>
         </div>
       </div>
     </AnimatedBackground>

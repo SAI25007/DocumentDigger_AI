@@ -1,0 +1,112 @@
+Goal: Build a web application that supports document upload and allows documents to be processed through four distinct stages:
+
+Ingested
+
+Extracted
+
+Classified
+
+Routed
+
+The application should support:
+
+A full pipeline execution (when uploading a file, it automatically passes through all stages sequentially).
+
+Manual triggering of each stage individually for already uploaded documents.
+
+A dashboard interface showing all four stages with dedicated action buttons.
+
+🧩 Functional Requirements
+Frontend (Dashboard Page):
+Four main buttons/cards:
+
+Ingested, Extracted, Classified, Routed
+
+Each should have:
+
+A file input or selection option
+
+A "Run" button to process only that stage
+
+A status/preview panel to show the output/result of the selected stage
+
+Upload Page:
+Upload a document (PDF, DOCX, Image, etc.)
+
+On upload, the backend should trigger:
+
+Ingest → Extract → Classify → Route (in sequence)
+
+The final result (with status and intermediate results) should be viewable on the dashboard or a result page
+
+🧠 Backend (Logic & API Requirements)
+Common:
+Use REST APIs or GraphQL for stage-wise endpoints
+
+Each stage should accept an input file or a file ID
+
+Use async processing or background jobs for longer processing tasks
+
+Endpoints (examples):
+POST /upload: Upload and run full pipeline
+
+POST /ingest: Run ingestion on uploaded file
+
+POST /extract: Run data extraction on file
+
+POST /classify: Classify content using ML/NLP
+
+POST /route: Determine where to route the document
+
+GET /status/{fileId}: Retrieve processing status of all stages
+
+GET /results/{fileId}/{stage}: Get output/result of a specific stage
+
+🖼️ UI Behavior
+Dashboard should visually show the status (e.g., Pending, In Progress, Done) of each document per stage.
+
+Support drag & drop file upload or use a file picker.
+
+Allow users to:
+
+Upload a new document (triggers full flow)
+
+Select an existing uploaded document and process it manually through one or more stages
+
+View logs or preview output per stage (e.g., text extracted, classification result)
+
+📦 Technologies (Suggested Stack)
+Frontend: React + Tailwind CSS + Axios
+
+Backend: Node.js/Express or Python/FastAPI
+
+Storage: S3 or local file system
+
+Database: MongoDB or PostgreSQL for tracking file metadata and stage status
+
+Optional:
+
+Queue system: Celery or BullMQ (for async task processing)
+
+AI/ML stage: Use HuggingFace models or custom-trained classification models
+
+✅ Example Flow
+User uploads invoice.pdf
+
+Backend:
+
+Ingest → stores the file and assigns ID
+
+Extract → extracts text using OCR or PDF parser
+
+Classify → uses ML to tag the doc as "Invoice"
+
+Route → decides to send to "Accounts Payable" queue
+
+UI shows:
+
+File Name: invoice.pdf
+
+Ingested ✅ | Extracted ✅ | Classified ✅ | Routed ✅
+
+Later, user selects resume.docx and only runs Classify stage.

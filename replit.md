@@ -105,10 +105,15 @@ DocFlow AI is an intelligent document processing platform that automates documen
 - **Port Configuration**: Internal 5000 → External 80
 - **File Storage**: Uploads directory for temporary file storage
 
-## Changelog
+## Recent Changes
 
-Changelog:
-- June 21, 2025. Initial setup
+- June 21, 2025: Created comprehensive document processing dashboard with 4-stage pipeline
+- Added theme support (light/dark/system) with persistent storage  
+- Separated upload functionality into dedicated /upload page
+- Implemented individual stage panels (Ingest, Extract, Classify, Route) with manual processing capabilities
+- Added stage-specific API endpoints for manual processing
+- Enhanced UI with stage performance metrics and visual representations
+- Integrated WebSocket updates for real-time processing status
 
 ## User Preferences
 

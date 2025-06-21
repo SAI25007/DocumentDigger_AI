@@ -7,6 +7,7 @@ import fs from "fs";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
 import { insertDocumentSchema } from "@shared/schema";
+import stageProcessingRoutes from "./routes/stage-processing";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -41,6 +42,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
   }
+
+  // Mount stage processing routes
+  app.use("/api", stageProcessingRoutes);
 
   // Auth routes
   app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
