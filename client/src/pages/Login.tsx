@@ -1,13 +1,29 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Brain, LogIn, Shield, Users, Zap, ArrowRight } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Brain, LogIn, Shield, Users, Zap, ArrowRight, Mail, FileText, Sparkles } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "wouter";
+import { AnimatedBackground } from "@/components/ui/animated-background";
+import { GlassCard } from "@/components/ui/glass-card";
+import { motion } from "framer-motion";
 
 export default function Login() {
   const { isAuthenticated, isLoading } = useAuth();
   const [, setLocation] = useLocation();
+  const [currentQuote, setCurrentQuote] = useState(0);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
+
+  const quotes = [
+    "AI-powered document intelligence at your fingertips",
+    "Transform chaos into structured insights",
+    "Process thousands of documents in seconds",
+    "Enterprise-grade security meets AI innovation"
+  ];
 
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
@@ -15,90 +31,194 @@ export default function Login() {
     }
   }, [isAuthenticated, isLoading, setLocation]);
 
-  const handleLogin = () => {
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentQuote((prev) => (prev + 1) % quotes.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleSSOLogin = () => {
     window.location.href = "/api/login";
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
-      </div>
+      <AnimatedBackground variant="minimal">
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-400"></div>
+        </div>
+      </AnimatedBackground>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-100 flex items-center justify-center relative overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-pulse"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-200 rounded-full mix-blend-multiply filter blur-xl opacity-50 animate-pulse"></div>
-      </div>
-
-      <div className="relative z-10 w-full max-w-md px-4">
-        <Card className="shadow-2xl border-0 bg-white/80 backdrop-blur-lg">
-          <CardHeader className="text-center space-y-4 pb-8">
-            <div className="mx-auto w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
-              <Brain className="w-8 h-8 text-white" />
-            </div>
-            <CardTitle className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Welcome to DocFlow AI
-            </CardTitle>
-            <p className="text-gray-600 text-sm leading-relaxed">
-              Sign in to access your intelligent document processing dashboard
-            </p>
-          </CardHeader>
-          
-          <CardContent className="space-y-6">
-            <Button 
-              onClick={handleLogin}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-3 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
-              size="lg"
-            >
-              <LogIn className="w-5 h-5 mr-2" />
-              Sign In with Replit
-            </Button>
-
-            <div className="mt-8 space-y-4">
-              <div className="text-center text-sm text-gray-500 mb-4">
-                What you'll get access to:
-              </div>
-              
-              <div className="space-y-3">
-                <div className="flex items-center text-sm text-gray-600">
-                  <Shield className="w-4 h-4 text-blue-500 mr-3 flex-shrink-0" />
-                  <span>Secure document processing pipeline</span>
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <Zap className="w-4 h-4 text-purple-500 mr-3 flex-shrink-0" />
-                  <span>Real-time processing status updates</span>
-                </div>
-                <div className="flex items-center text-sm text-gray-600">
-                  <Users className="w-4 h-4 text-indigo-500 mr-3 flex-shrink-0" />
-                  <span>Operator dashboard with manual overrides</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-4 border-t border-gray-200">
-              <div className="text-xs text-gray-500 text-center">
-                New to DocFlow AI? Your account will be created automatically after signing in.
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <div className="mt-6 text-center">
-          <a 
-            href="/" 
-            className="inline-flex items-center text-sm text-gray-600 hover:text-gray-800 transition-colors"
+    <AnimatedBackground variant="neural">
+      <div className="min-h-screen flex">
+        {/* Left Panel - Quote Section */}
+        <div className="hidden lg:flex lg:w-1/2 flex-col justify-center px-12 relative">
+          <motion.div
+            initial={{ opacity: 0, x: -50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8 }}
+            className="space-y-8"
           >
-            <ArrowRight className="w-4 h-4 mr-1 transform rotate-180" />
-            Back to homepage
-          </a>
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                <Brain className="w-6 h-6 text-white" />
+              </div>
+              <span className="text-2xl font-bold text-white">DocFlow AI</span>
+            </div>
+            
+            <motion.div
+              key={currentQuote}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="space-y-4"
+            >
+              <h1 className="text-4xl font-bold text-white leading-tight">
+                {quotes[currentQuote]}
+              </h1>
+              <p className="text-xl text-blue-200">
+                Join thousands of enterprises automating their document workflows
+              </p>
+            </motion.div>
+            
+            <div className="flex space-x-8 text-blue-200">
+              <div className="flex items-center space-x-2">
+                <FileText className="w-5 h-5" />
+                <span>10M+ Documents Processed</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Zap className="w-5 h-5" />
+                <span>99.9% Accuracy</span>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Right Panel - Login Form */}
+        <div className="w-full lg:w-1/2 flex items-center justify-center px-6">
+          <motion.div
+            initial={{ opacity: 0, x: 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="w-full max-w-md"
+          >
+            <GlassCard variant="elevated" className="p-8">
+              <div className="text-center space-y-4 mb-8">
+                <div className="lg:hidden flex items-center justify-center space-x-3 mb-6">
+                  <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                    <Brain className="w-5 h-5 text-white" />
+                  </div>
+                  <span className="text-xl font-bold text-white">DocFlow AI</span>
+                </div>
+                
+                <h2 className="text-2xl font-bold text-white">Welcome Back</h2>
+                <p className="text-blue-200">Sign in to your account</p>
+              </div>
+
+              <form className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="email" className="text-white">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="bg-white/10 border-white/20 text-white placeholder-white/50 focus:border-blue-400"
+                    placeholder="Enter your email"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="password" className="text-white">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="bg-white/10 border-white/20 text-white placeholder-white/50 focus:border-blue-400"
+                    placeholder="Enter your password"
+                  />
+                </div>
+
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <input
+                      id="remember"
+                      type="checkbox"
+                      checked={rememberMe}
+                      onChange={(e) => setRememberMe(e.target.checked)}
+                      className="w-4 h-4 rounded border-white/20 bg-white/10"
+                    />
+                    <Label htmlFor="remember" className="text-sm text-blue-200">
+                      Remember me
+                    </Label>
+                  </div>
+                  <a href="#" className="text-sm text-blue-400 hover:text-blue-300 transition-colors">
+                    Forgot password?
+                  </a>
+                </div>
+
+                <Button
+                  type="button"
+                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-3 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
+                >
+                  <LogIn className="w-5 h-5 mr-2" />
+                  Sign In
+                </Button>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-white/20" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-transparent px-2 text-blue-200">Or continue with</span>
+                  </div>
+                </div>
+
+                <Button
+                  type="button"
+                  onClick={handleSSOLogin}
+                  variant="outline"
+                  className="w-full border-white/20 bg-white/5 hover:bg-white/10 text-white font-medium py-3 rounded-lg transition-all duration-300 hover:scale-105"
+                >
+                  <Sparkles className="w-5 h-5 mr-2" />
+                  Login with SSO
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full border-white/20 bg-white/5 hover:bg-white/10 text-white font-medium py-3 rounded-lg transition-all duration-300 hover:scale-105"
+                >
+                  <Mail className="w-5 h-5 mr-2" />
+                  Connect Mailbox
+                </Button>
+              </form>
+
+              <div className="mt-8 pt-6 border-t border-white/20 text-center">
+                <p className="text-xs text-blue-200">
+                  New to DocFlow AI? Your account will be created automatically.
+                </p>
+              </div>
+            </GlassCard>
+
+            <div className="mt-6 text-center">
+              <a 
+                href="/" 
+                className="inline-flex items-center text-sm text-blue-300 hover:text-white transition-colors"
+              >
+                <ArrowRight className="w-4 h-4 mr-1 transform rotate-180" />
+                Back to homepage
+              </a>
+            </div>
+          </motion.div>
         </div>
       </div>
-    </div>
+    </AnimatedBackground>
   );
 }

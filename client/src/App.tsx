@@ -8,7 +8,7 @@ import NotFound from "@/pages/not-found";
 import Landing from "@/pages/Landing";
 import Login from "@/pages/Login";
 import Logout from "@/pages/Logout";
-import Dashboard from "@/pages/Dashboard";
+import ModernDashboard from "@/pages/ModernDashboard";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -24,7 +24,7 @@ function Router() {
         <Route path="/" component={Landing} />
       ) : (
         <>
-          <Route path="/" component={Dashboard} />
+          <Route path="/" component={ModernDashboard} />
         </>
       )}
       <Route component={NotFound} />

@@ -1,0 +1,113 @@
+Design a sleek, modern enterprise web application for AI-powered document ingestion, extraction, classification, and routing system. Use a glassmorphism + neumorphism-inspired UI with a cool-toned color palette (blues, purples, and soft gradients). Use Framer Motion-style animations for transitions.
+
+🧠 Overall Theme:
+Futuristic but minimal.
+
+Use floating panels, animated icons, and soft drop shadows.
+
+Smooth loading skeletons and hover effects.
+
+Responsive layout using CSS Grid/Flexbox.
+
+Include a light/dark toggle.
+
+🧑‍💻 Login Page
+Prompt for AI:
+Design an engaging login screen with the following:
+
+Centered login card with blurred glass effect.
+
+Logo (AI + Document icon blend).
+
+Fields: Email, Password, with floating label animation.
+
+"Login with SSO" and "Connect Mailbox" buttons.
+
+Subtle animated background: pulsing nodes and document icons drifting slowly, like a neural network.
+
+Left-side animated quote or fun AI message (rotates on page load).
+
+Remember Me + Forgot Password link with micro-interaction.
+
+Animated success transition when login is successful.
+
+📂 Operator Dashboard (Main Page)
+Split layout with 3 main panels and top navigation.
+
+Navigation Bar (Top)
+
+Logo + Name
+
+Tabs: Dashboard | Uploads | Monitoring | Settings
+
+Profile dropdown with logout/settings
+
+Soft entrance animation (slide+fade)
+
+Left Sidebar (Animated Panel)
+
+Icon-based navigation: Upload ➜ Extract ➜ Classify ➜ Route
+
+Vertical progress flow with real-time updates
+
+Hover reveals status tooltips
+
+Main Content Area
+
+Upload Panel:
+
+Drag & Drop zone with animated document drop (document icon falling, small bounce).
+
+Button: “Connect Mailbox” with glowing effect on hover.
+
+Workflow Progress Bar:
+
+4 Steps with animated checkmarks and real-time timestamp display.
+
+Smooth line draw between steps with Lottie animations.
+
+Hover on steps shows: “OCR completed in 3.2s” with a floating tooltip.
+
+Document List Table:
+
+Table with columns: Name, Type, Status, Last Updated.
+
+Rows animate in from bottom.
+
+Click to expand into a side drawer with full metadata, timeline animation.
+
+Manual Overrides Section:
+
+Buttons: “Re-extract”, “Re-classify”, “Route to...”
+
+Buttons animate on press with ripple effect.
+
+🛠️ Admin View (Settings & Monitoring Panel)
+Filter documents by type, confidence score, routing status.
+
+Animated charts: Line graph for processing speed, Pie chart for document types.
+
+System health status with blinking green/yellow/red indicators.
+
+Retry queue list with animated priority badge (urgent, normal).
+
+📱 Mobile View
+Collapse left sidebar into hamburger menu.
+
+Cards instead of table rows.
+
+Swipe actions for Re-classify or Re-route.
+
+🎨 Design System & Animation Summary:
+Typography: Inter, Poppins or IBM Plex Sans.
+
+Color Scheme: #1F2937, #3B82F6, #9333EA, #E5E7EB
+
+Animations: Framer Motion-inspired (fade, slide, scale on hover)
+
+Illustrations: Use Docusign-style vector illustrations for empty states
+
+Icons: Lucide / Feather Icons
+
+✅ Prompt Summary for AI Systems:
+"Generate a modern enterprise UI with a clean, responsive layout and a futuristic AI theme. Include a login page with animated background and glassmorphic card, and a 4-stage document processing dashboard with animated progress bar, table with interactive rows, and override options. Use smooth transitions, floating panels, interactive tooltips, dark/light mode, and visual feedback for all actions. Include mobile responsiveness and admin analytics. Maintain accessibility and user-centric UX."
