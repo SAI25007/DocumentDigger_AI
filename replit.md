@@ -1,8 +1,8 @@
-# DocFlow AI - Document Ingestion & Classification System
+# DocumentDigger AI - Document Ingestion & Classification System
 
 ## Overview
 
-DocFlow AI is an intelligent document processing platform that automates document ingestion, classification, and routing through a 4-stage AI-powered pipeline. The system provides real-time processing capabilities with live status tracking, handling multiple file formats including PDFs, Word documents, and images up to 50MB.
+DocumentDigger AI is an intelligent document processing platform that automates document ingestion, classification, and routing through a 4-stage AI-powered pipeline. The system provides comprehensive dark/light theme support, individual stage-specific pages with dedicated AI functionality, and real-time processing capabilities with live status tracking, handling multiple file formats including PDFs, Word documents, and images up to 50MB.
 
 ## System Architecture
 
@@ -108,12 +108,14 @@ DocFlow AI is an intelligent document processing platform that automates documen
 ## Recent Changes
 
 - June 21, 2025: Created comprehensive document processing dashboard with 4-stage pipeline
-- Added theme support (light/dark/system) with persistent storage  
-- Separated upload functionality into dedicated /upload page
-- Implemented individual stage panels (Ingest, Extract, Classify, Route) with manual processing capabilities
-- Added stage-specific API endpoints for manual processing
-- Enhanced UI with stage performance metrics and visual representations
-- Integrated WebSocket updates for real-time processing status
+- Added full application theme support (light/dark/system) with smooth transitions and persistent storage
+- Rebranded application to "DocumentDigger AI" with updated branding throughout
+- Created dedicated pages for each processing stage (/ingest, /extract, /classify, /route)
+- Implemented individual AI-powered functionality for each stage with specialized features
+- Added individual upload capabilities and stage-specific processing on each page
+- Enhanced UI with comprehensive dark/light theme coverage and smooth animations
+- Integrated stage-specific AI features and visual representations
+- Added dedicated routing with proper navigation between stage pages
 
 ## User Preferences
 

@@ -11,6 +11,10 @@ import Login from "@/pages/Login";
 import Logout from "@/pages/Logout";
 import ModernDashboard from "@/pages/ModernDashboard";
 import Upload from "@/pages/Upload";
+import IngestPage from "@/pages/IngestPage";
+import ExtractPage from "@/pages/ExtractPage";
+import ClassifyPage from "@/pages/ClassifyPage";
+import RoutePage from "@/pages/RoutePage";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -29,6 +33,10 @@ function Router() {
           <Route path="/" component={ModernDashboard} />
           <Route path="/dashboard" component={ModernDashboard} />
           <Route path="/upload" component={Upload} />
+          <Route path="/ingest" component={IngestPage} />
+          <Route path="/extract" component={ExtractPage} />
+          <Route path="/classify" component={ClassifyPage} />
+          <Route path="/route" component={RoutePage} />
         </>
       )}
       <Route component={NotFound} />

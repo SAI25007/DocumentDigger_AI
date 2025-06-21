@@ -173,7 +173,7 @@ export default function ModernDashboard() {
                   <Brain className="h-5 w-5 text-white" />
                 </div>
                 <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                  DocFlow AI
+                  DocumentDigger AI
                 </h1>
               </div>
             </div>
@@ -219,38 +219,42 @@ export default function ModernDashboard() {
                   <Home className="h-4 w-4" />
                   Overview
                 </Button>
-                <Button
-                  variant={activeTab === "ingest" ? "default" : "ghost"}
-                  className="w-full justify-start gap-2"
-                  onClick={() => setActiveTab("ingest")}
-                >
-                  <Upload className="h-4 w-4" />
-                  Ingest
-                </Button>
-                <Button
-                  variant={activeTab === "extract" ? "default" : "ghost"}
-                  className="w-full justify-start gap-2"
-                  onClick={() => setActiveTab("extract")}
-                >
-                  <FileSearch className="h-4 w-4" />
-                  Extract
-                </Button>
-                <Button
-                  variant={activeTab === "classify" ? "default" : "ghost"}
-                  className="w-full justify-start gap-2"
-                  onClick={() => setActiveTab("classify")}
-                >
-                  <Brain className="h-4 w-4" />
-                  Classify
-                </Button>
-                <Button
-                  variant={activeTab === "route" ? "default" : "ghost"}
-                  className="w-full justify-start gap-2"
-                  onClick={() => setActiveTab("route")}
-                >
-                  <Route className="h-4 w-4" />
-                  Route
-                </Button>
+                <Link href="/ingest">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start gap-2"
+                  >
+                    <Upload className="h-4 w-4" />
+                    Ingest
+                  </Button>
+                </Link>
+                <Link href="/extract">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start gap-2"
+                  >
+                    <FileSearch className="h-4 w-4" />
+                    Extract
+                  </Button>
+                </Link>
+                <Link href="/classify">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start gap-2"
+                  >
+                    <Brain className="h-4 w-4" />
+                    Classify
+                  </Button>
+                </Link>
+                <Link href="/route">
+                  <Button
+                    variant="ghost"
+                    className="w-full justify-start gap-2"
+                  >
+                    <Route className="h-4 w-4" />
+                    Route
+                  </Button>
+                </Link>
                 <Button
                   variant={activeTab === "analytics" ? "default" : "ghost"}
                   className="w-full justify-start gap-2"
@@ -322,18 +326,18 @@ export default function ModernDashboard() {
                         { stage: 3, name: "Classify", icon: Brain, count: documents.filter(d => d.currentStage >= 3).length },
                         { stage: 4, name: "Route", icon: Route, count: documents.filter(d => d.currentStage >= 4).length },
                       ].map((stage) => (
-                        <Button
-                          key={stage.stage}
-                          variant="outline"
-                          className="h-auto p-4 flex flex-col items-center gap-2"
-                          onClick={() => setActiveTab(stage.name.toLowerCase())}
-                        >
-                          <stage.icon className="h-6 w-6" />
-                          <div className="text-center">
-                            <p className="font-semibold">{stage.name}</p>
-                            <p className="text-sm text-muted-foreground">{stage.count} docs</p>
-                          </div>
-                        </Button>
+                        <Link key={stage.stage} href={`/${stage.name.toLowerCase()}`}>
+                          <Button
+                            variant="outline"
+                            className="h-auto p-4 flex flex-col items-center gap-2 w-full"
+                          >
+                            <stage.icon className="h-6 w-6" />
+                            <div className="text-center">
+                              <p className="font-semibold">{stage.name}</p>
+                              <p className="text-sm text-muted-foreground">{stage.count} docs</p>
+                            </div>
+                          </Button>
+                        </Link>
                       ))}
                     </div>
                   </GlassCard>

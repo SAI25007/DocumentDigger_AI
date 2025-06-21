@@ -130,7 +130,7 @@ export default function UploadPage() {
             animate={{ opacity: 1, y: 0 }}
             className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
           >
-            Document Upload
+            DocumentDigger AI Upload
           </motion.h1>
           <motion.p 
             initial={{ opacity: 0, y: -20 }}
