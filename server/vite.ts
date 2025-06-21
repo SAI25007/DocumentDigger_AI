@@ -16,7 +16,13 @@ export function log(message: string, source = "express") {
     hour12: true,
   });
 
-  console.log(`${formattedTime} [${source}] ${message}`);
+  // Truncate message if it's too long to prevent ArrayBuffer issues
+  let truncatedMessage = message;
+  if (message.length > 200) {
+    truncatedMessage = message.slice(0, 199) + "…";
+  }
+
+  console.log(`${formattedTime} [${source}] ${truncatedMessage}`);
 }
 
 export async function setupVite(app: Express, server: Server) {
