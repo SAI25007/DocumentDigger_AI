@@ -16,10 +16,11 @@ export default function Logout() {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setIsLoggingOut(true);
-    // Redirect to logout endpoint
-    window.location.href = "/api/logout";
+    // POST to logout endpoint and redirect to login
+    await fetch("/api/logout", { method: "POST" });
+    window.location.href = "/login";
   };
 
   const handleStaySignedIn = () => {

@@ -14,7 +14,18 @@ import ManualOverride from "@/components/ManualOverride";
 
 export default function Dashboard() {
   const { toast } = useToast();
-  const { user, isAuthenticated, isLoading } = useAuth();
+  type User = {
+    profileImageUrl?: string;
+    firstName?: string;
+    email?: string;
+    // add other fields as needed
+  };
+
+  const { user, isAuthenticated, isLoading } = useAuth() as {
+    user: User | null;
+    isAuthenticated: boolean;
+    isLoading: boolean;
+  };
 
   // Redirect to home if not authenticated
   useEffect(() => {
@@ -43,8 +54,16 @@ export default function Dashboard() {
     retry: false,
   });
 
-  const handleLogout = () => {
-    window.location.href = "/api/logout";
+  // Enhanced logout for SSO and launch page
+  const handleLogout = async () => {
+    // If using SSO, redirect to SSO login page
+    const isSSO = window.location.search.includes('sso');
+    await fetch("/api/logout", { method: "POST" });
+    if (isSSO) {
+      window.location.href = "/"; // Launch page
+    } else {
+      window.location.href = "/login"; // Default login page
+    }
   };
 
   if (isLoading || !isAuthenticated) {
@@ -80,6 +99,14 @@ export default function Dashboard() {
             </div>
             
             <div className="flex items-center space-x-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => { window.location.href = "/"; }}
+                className="text-gray-700 border-gray-300 hover:bg-blue-50 transition-all duration-300"
+              >
+                Back to Launch
+              </Button>
               <div className="flex items-center space-x-3">
                 {user?.profileImageUrl && (
                   <img 
@@ -204,7 +231,7 @@ export default function Dashboard() {
           {/* Document List */}
           <div className="lg:col-span-2">
             <DocumentTable 
-              documents={documents || []} 
+              documents={Array.isArray(documents) ? documents : []} 
               loading={documentsLoading}
               onRefetch={refetchDocuments}
             />

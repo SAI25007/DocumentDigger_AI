@@ -17,6 +17,7 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [loginError, setLoginError] = useState("");
 
   const quotes = [
     "AI-powered document intelligence at your fingertips",
@@ -40,6 +41,25 @@ export default function Login() {
 
   const handleSSOLogin = () => {
     window.location.href = "/api/login";
+  };
+
+  const handleEmailLogin = async () => {
+    setLoginError("");
+    try {
+      const res = await fetch("/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setLoginError(data.message || "Login failed");
+        return;
+      }
+      window.location.href = "/";
+    } catch (e) {
+      setLoginError("Login failed");
+    }
   };
 
   if (isLoading) {
@@ -166,10 +186,14 @@ export default function Login() {
                 <Button
                   type="button"
                   className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium py-3 rounded-lg transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-xl"
+                  onClick={handleEmailLogin}
                 >
                   <LogIn className="w-5 h-5 mr-2" />
                   Sign In
                 </Button>
+                {loginError && (
+                  <div className="text-red-400 text-sm text-center mt-2">{loginError}</div>
+                )}
 
                 <div className="relative">
                   <div className="absolute inset-0 flex items-center">
@@ -213,7 +237,7 @@ export default function Login() {
                 className="inline-flex items-center text-sm text-blue-300 hover:text-white transition-colors"
               >
                 <ArrowRight className="w-4 h-4 mr-1 transform rotate-180" />
-                Back to homepage
+                Back to Launch
               </a>
             </div>
           </motion.div>

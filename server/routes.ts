@@ -5,7 +5,7 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
+import { setupAuth, isAuthenticated } from "./auth";
 import { insertDocumentSchema } from "@shared/schema";
 import stageProcessingRoutes from "./routes/stage-processing";
 
@@ -55,6 +55,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching user:", error);
       res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  // Logout route for frontend compatibility
+  app.post('/api/logout', (req, res) => {
+    if (req.session) {
+      req.session.destroy((err: any) => {
+        if (err) {
+          console.error('Error destroying session:', err);
+          return res.status(500).json({ message: 'Logout failed' });
+        }
+        res.clearCookie('connect.sid'); // Default session cookie name
+        return res.json({ message: 'Logged out successfully' });
+      });
+    } else {
+      res.json({ message: 'Logged out successfully' });
     }
   });
 

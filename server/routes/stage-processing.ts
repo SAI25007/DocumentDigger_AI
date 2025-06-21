@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { storage } from '../storage';
-import { isAuthenticated } from '../replitAuth';
+import { isAuthenticated } from '../auth';
 
 const router = Router();
 
@@ -9,7 +9,7 @@ router.post('/documents/:id/process/:stage', isAuthenticated, async (req, res) =
   try {
     const documentId = parseInt(req.params.id);
     const stage = parseInt(req.params.stage);
-    const userId = req.user!.id;
+    const userId = (req.user as { id: number }).id;
 
     // Validate stage number
     if (stage < 1 || stage > 4) {
@@ -23,7 +23,7 @@ router.post('/documents/:id/process/:stage', isAuthenticated, async (req, res) =
     }
 
     // Check if user owns the document
-    if (document.userId !== userId) {
+    if (String(document.userId) !== String(userId)) {
       return res.status(403).json({ error: 'Access denied' });
     }
 
